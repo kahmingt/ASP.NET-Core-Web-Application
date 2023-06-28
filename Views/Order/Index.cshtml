@@ -1,0 +1,121 @@
+﻿@model IEnumerable<OrderDetailsListIndex>
+
+@section scripts{
+}
+
+@{
+    var _Sort = Context.Request.Query["Sort"];
+
+    ViewBag.Title = "Order List";
+}
+
+<div class="container">
+    <div class="panel">
+        <div class="panel-body">
+            <div class="row">
+                @if (TempData["Alerts"] != null)
+                {
+                    var Alerts = (TempData["Alerts"]) as WebApp.Models.Alerts;
+                    <div class="alert @Alerts.Type alert-dismissible fade show" role="alert">
+                        <button class="close" data-bs-dismiss="alert" aria-label="Close" style="background:none; color:inherit;	border:none;">
+                            <span aria-hidden="true" style="font-size:1.45em;">&times;</span>
+                        </button>
+                        @Alerts.Message
+                    </div>
+                }
+                @Html.Raw(ViewBag.Alert)
+            </div>
+            <br />
+            <div class="row">
+                <div class="input-group mb-3" style="display:flex; align-items:center; justify-content:space-between;">
+                    <h3>@ViewBag.Title</h3>&nbsp;&nbsp;
+                    <a class="btn btn-sm btn-outline-success" href="@Url.Action("Details", new { Mode = "Edit" })">
+                        <span><i class="bi bi-plus"></i>&nbsp;New Order</span>
+                    </a>
+                    <div class="col-xl-6 col-md-6 col-sm-6 col-6" style="float:inline-end; margin-left: auto;">
+                        <div class="input-group has-feedback">
+                            <span class="input-group-text form-control-feedback" style="background-color: rgba(255,255,255,0.5);"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control border-start-0 small" id="BtnSearch_Order" placeholder="Search for..." value="@ViewData["Search"]" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <br />
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table TableList table-hover">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>
+                                    <a asp-action="Index" asp-route-Sort="@ViewData["OrderDateSortParm"]" asp-route-Filter="@ViewData["Filter"]" style="text-decoration:none; color: #000000;">
+                                        <span>
+                                            Order Date&nbsp;
+                                            @if (string.IsNullOrWhiteSpace(_Sort) || !(_Sort.Contains("OrderDate") || _Sort.Contains("OrderDate_")))
+                                            {
+                                                <i class="fa-solid fa-sort"></i>
+                                            }
+                                            else
+                                            {
+                                                if (_Sort == "OrderDate_")
+                                                {
+                                                    <i class="fa-solid fa-sort-down"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa-solid fa-sort-up"></i>
+                                                }
+                                            }
+                                        </span>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-action="Index" asp-route-Sort="@ViewData["CustomerNameSortParm"]" asp-route-Filter="@ViewData["Filter"]" style="text-decoration:none; color: #000000;">
+                                        <span>
+                                            Customer Name&nbsp;
+                                            @if (string.IsNullOrWhiteSpace(_Sort) || !(_Sort.Contains("CustomerName") || _Sort.Contains("CustomerName_")))
+                                            {
+                                                <i class="fa-solid fa-sort"></i>
+                                            }
+                                            else
+                                            {
+                                                if (_Sort == "CustomerName_")
+                                                {
+                                                    <i class="fa-solid fa-sort-down"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa-solid fa-sort-up"></i>
+                                                }
+                                            }
+                                        </span>
+                                    </a>
+                                </th>
+                                <th>Items Ordered</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null)
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a class="bi bi-eye" href="@Url.Action("Details", new { OrderID = item.OrderID, Mode = "View" })"></a>
+                                        </td>
+                                        <td>@item.OrderDate.ToString("dd-MM-yyyy")</td>
+                                        <td>@item.CustomerName</td>
+                                        <td>@item.OrderCount</td>
+                                        <td style="width:75px;text-align:right;">$@item.TotalCost.ToString("n2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
