@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Diagnostics;
 using System.Text;
-using WebApp.DbContext.Entities;
 using WebApp.DbContext;
-using WebApp.Models;
+using WebApp.DbContext.Entities;
 using WebApp.Extensions;
+using WebApp.Models;
 
 namespace WebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class OrderController : Controller
     {
         private readonly ApplicationDbContext _db;

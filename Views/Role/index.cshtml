@@ -1,0 +1,32 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Add new Asp Net Role";
+}
+
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.ValidationMessage("CustomError")
+    </div>
+}
+
+
+<h2>@ViewData["Title"]</h2>
+<br />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div class="input-group">
+                <input type="text" class="form-control" name="RoleName" aria-describedby="" aria-label="Role" placeholder="Add new role here">
+                <button class="btn btn-outline-primary" type="submit" id="">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!--
+Reference:
+https://www.yogihosting.com/aspnet-core-identity-roles/#:~:text=ASP.NET%20Core%20Identity%20Create%20Role,-We%20use%20CreateAsync&text=In%20the%20below%20code%20of,the%20create%20action%20method%20code.&text=The%20Create%20Action%20takes%20the,IdentityResult%20result%20%3D%20await%20roleManager.
+-->
