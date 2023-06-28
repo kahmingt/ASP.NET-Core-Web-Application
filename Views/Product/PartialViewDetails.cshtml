@@ -1,0 +1,106 @@
+﻿@model WebApp.Models.ProductDetails
+
+
+<div class="container">
+    <input type="hidden" asp-for="ProductID" id="ProductID" />
+    <div class="form-horizontal">
+        <div class="form-group row mb-3">
+            <label asp-for="CategoryName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field"></label>
+            <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                @if (Model.Mode == "View")
+                {
+                    <input type="text" class="form-control" asp-for="CategoryName" id="CategoryName" disabled />
+                }
+                @if (Model.Mode == "Edit")
+                {
+                    <select class="form-select" asp-for="CategoryID" asp-items="@ViewBag.CategoryListing" id="CategoryID" required >
+                        <option selected disabled>-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CategoryID" class="text-danger"></span>
+                }
+            </div>
+        </div>
+        <div class="form-group row mb-3">
+            <label asp-for="ProductName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field"></label>
+            <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                @if (Model.Mode == "View")
+                {
+                    <input type="text" class="form-control" asp-for="ProductName" id="ProductName" disabled />
+                }
+                @if (Model.Mode == "Edit")
+                {
+                    <input type="text" class="form-control" asp-for="ProductName" id="ProductName" required />
+                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                }
+            </div>
+        </div>
+        <div class="form-group row mb-3">
+            <label asp-for="SupplierName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field"></label>
+            <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                @if (Model.Mode == "View")
+                {
+                    <input type="text" class="form-control" asp-for="SupplierName" id="SupplierName" disabled />
+                }
+                @if (Model.Mode == "Edit")
+                {
+                    <select class="form-select" asp-for="SupplierID" asp-items="@ViewBag.SupplierListing" id="SupplierID" required >
+                        <option selected disabled>-- Select Supplier --</option>
+                    </select>
+                    <span asp-validation-for="SupplierID" class="text-danger"></span>
+                }
+            </div>
+        </div>
+        <div class="form-group row mb-3">
+            <label asp-for="UnitInStock" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field"></label>
+            <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                @if (Model.Mode == "View")
+                {
+                    <input type="text" class="form-control" asp-for="UnitInStock" id="UnitInStock" disabled />
+                }
+                @if (Model.Mode == "Edit")
+                {
+                    <input type="number" class="form-control" asp-for="UnitInStock" id="UnitInStock" required />
+                    <span asp-validation-for="UnitInStock" class="text-danger"></span>
+                }
+            </div>
+        </div>
+        <div class="form-group row mb-3">
+            <label asp-for="UnitPrice" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field"></label>
+            <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                @if (Model.Mode == "View")
+                {
+                    <input type="text" class="form-control" asp-for="UnitPrice" id="UnitPrice" disabled />
+                }
+                @if (Model.Mode == "Edit")
+                {
+                    <input type="number" class="form-control" asp-for="UnitPrice" id="UnitPrice" required />
+                    <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Modal - ModalDelete -->
+<div class="modal fade" id="ModalDelete" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="Title">Delete Confirmation</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this record?</p>
+            </div>
+            <div class="modal-footer">
+                <button asp-action="Index" asp-route-id="@Model.ProductID" asp-route-mode="Edit" class="btn btn-danger"
+                type="submit" name="button" value="ButtonDelete" id="ModalDelete_ButtonDelete" title="Delete">
+                    <i class="bi bi-check-lg"></i>&nbsp;&nbsp;Yes&nbsp;&nbsp;
+                </button>
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="button" name="" value="" id="ModalDelete_ButtonCancel" title="Cancel">
+                    <i class="bi bi-x-lg"></i>&nbsp;&nbsp;Cancel&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

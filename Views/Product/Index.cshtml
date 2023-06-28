@@ -1,0 +1,92 @@
+﻿@model IEnumerable<WebApp.Models.ProductListing>
+
+@section scripts{
+    <script type="text/javascript" src="~/js/Product.js" asp-append-version="true"></script>
+}
+
+<!-- Global variable declaration -->
+@{
+    ViewBag.Title = "Product List";
+}
+
+<div class="container">
+    <partial name="_BootstrapAlert" />
+    <br />
+    <div class="row">
+        <div class="input-group mb-3" style="display:flex; align-items:center; justify-content:space-between;">
+            <h1>@ViewBag.Title</h1>
+            <button class="btn btn-outline-success ml-auto" type="button" name="" value="" id="ModalDetails_ButtonCreate" title="Create">
+                <i class="bi bi-plus"></i>&nbsp;&nbsp;Create&nbsp;&nbsp;
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table TableList table-hover" id="TableProductList">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Category</th>
+                            <th>Product</th>
+                            <th>Unit in Stock</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="hidden" value="@(item.ProductID)" id="ProductID">
+                                        <a id="ButtonView" name="" title="View"><i class="bi bi-eye" style="font-size:1.10em;"></i></a>
+                                    </td>
+                                    <td>@item.CategoryName</td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.UnitInStock.ToString()</td>
+                                    <td>@item.UnitPrice.ToString("N2")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Modal - ModalDetails -->
+<div class="modal fade" id="ModalDetails" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="FormDetails" enctype="multipart/form-data" class="row g-3 needs-validation">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h3 class="Title">Product Details</h3>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" title="Close" style="border:none;background:none;">
+                        <i class="bi bi-x-lg" style="font-size:1.5em;"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" name="button" value="" id="ModalDetails_ButtonEdit" title="Edit">
+                        <span><i class="bi bi-pen"></i>&nbsp;&nbsp;Edit&nbsp;&nbsp;</span>
+                    </button>
+                    <button class="btn btn-success" type="submit" name="button" value="" id="ModalDetails_ButtonSubmit" title="Submit">
+                        <span><i class="bi bi-save"></i>&nbsp;&nbsp;Save&nbsp;&nbsp;</span>
+                    </button>
+                    <button class="btn btn-primary" type="button" name="" value="" id="ModalDetails_ButtonCancel" title="Cancel">
+                        <span><i class="bi bi-x-lg"></i>&nbsp;&nbsp;Cancel&nbsp;&nbsp;</span>
+                    </button>
+                    <button class="btn btn-danger" type="button" name="" value="" id="ModalDetails_ButtonDelete" title="Delete">
+                        <span><i class="bi bi-trash3"></i>&nbsp;&nbsp;Delete&nbsp;&nbsp;</span>
+                    </button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
