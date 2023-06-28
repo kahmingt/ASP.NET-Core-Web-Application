@@ -1,0 +1,365 @@
+﻿@model WebApp.Models.NestedOrderModel
+
+@section Scripts
+    {
+    <script src="~/js/Order.js" asp-append-version="true"></script>
+}
+
+@{
+    var _OrderID = Context.Request.Query["OrderID"];
+    var _Mode = Context.Request.Query["Mode"];
+
+    if (String.IsNullOrWhiteSpace(_OrderID))
+    {
+        ViewBag.Title = "New Order";
+    }
+    else
+    {
+        ViewBag.Title = "Order Summary for " + _OrderID;
+    }
+}
+
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            @if (TempData["Alerts"] != null)
+            {
+                var Alerts = (TempData["Alerts"]) as WebApp.Models.Alerts;
+                <div class="alert @Alerts.Type alert-dismissible fade show" role="alert">
+                    <button class="close" data-bs-dismiss="alert" aria-label="Close" style="background:none; color:inherit;	border:none;">
+                        <span aria-hidden="true" style="font-size:1.45em;">&times;</span>
+                    </button>
+                    @Alerts.Message
+                </div>
+            }
+            @Html.Raw(ViewBag.Alert)
+
+
+            @if (_Mode == "Edit")
+            {
+                <form method="post" asp-controller="Order" asp-action="Details" asp-route-OrderID="@_OrderID" asp-route-Mode="Edit" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <h3 class="Title" style="display:inline-block;">@ViewBag.Title</h3>
+                                <div style="float:right; position:relative; top:5px;">
+                                    @if (!String.IsNullOrWhiteSpace(_OrderID))
+                                    {
+                                        <button class="btn btn-sm btn-outline-success" type="submit" name="button" value="UpdateOrders" id="ButtonSave_Order" title="Save Order Report">
+                                            <span><i class="fa-sharp fa-solid fa-floppy-disk"></i></span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" type="button" name="" value="" id="ButtonDelete_Orders" title="Delete Order" data-target="#ModalDelete_Orders" data-toggle="modal">
+                                            <span><i class="bi bi-trash"></i></span>
+                                        </button>
+                                        <a href="@Url.Action("Details", new { OrderID = @_OrderID, Mode = "View" })" class="btn btn-sm btn-outline-primary" value="ButtonCancel" id="ButtonCancel" title="Cancel">
+                                            <span><i class="bi bi-x-lg"></i></span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-outline-primary" type="submit" name="button" value="CreateOrders" id="ButtonCreate_Order" title="Create Order Report">
+                                            <span><i class="fa-sharp fa-solid fa-floppy-disk"></i></span>
+                                        </button>
+                                        <a href="@Url.Action("Index", "Order")" class="btn btn-sm btn-outline-primary" id="ButtonEditOrder" title="Cancel">
+                                            <span><i class="bi bi-x-lg"></i></span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="OrderModel.OrderID" id="OrderID">
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <br />
+                            <h4>Order Info</h4>
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="form-group row mb-3">
+                                        <label asp-for="OrderModel.OrderDate" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Order Date</label>
+                                        <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                            <input type="date" asp-for="OrderModel.OrderDate" class="form-control datepicker" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" id="OrderDate" required>
+                                        </div>
+                                        <span asp-validation-for="OrderModel.OrderDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group row mb-3">
+                                        <label asp-for="OrderModel.EmployeeName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Handled By</label>
+                                        <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                            <select asp-for="OrderModel.EmployeeID" class="form-select" asp-items="ViewBag.DropDownList_EmployeeName" id="EmployeeID" aria-label="Employee Name Dropdownlist">
+                                                <option>-- Select Employee Name --</option>
+                                            </select>
+                                        </div>
+                                        <span asp-validation-for="OrderModel.EmployeeID" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group row mb-3">
+                                        <label asp-for="OrderModel.OrderGrandTotal" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Grand Total</label>
+                                        <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="text" class="form-control" asp-for="OrderModel.OrderGrandTotal" id="OrderGrandTotal" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <br />
+                            <h4>Customer Details</h4>
+                            <div class="form-horizontal">
+                                <div class="form-group row mb-3">
+                                    <label asp-for="OrderModel.CustomerName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Recepient</label>
+                                    <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                        <select asp-for="OrderModel.CustomerID" class="form-select" asp-items="ViewBag.DropDownList_CustomerName" id="CustomerID" aria-label="Customer Name Dropdownlist">
+                                            <option>-- Select Customer Name --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="OrderModel.CustomerID" class="text-danger"></span>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label asp-for="OrderModel.CustomerContactNumber" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Contact</label>
+                                    <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                        <input type="text" class="form-control" asp-for="OrderModel.CustomerContactNumber" id="CustomerContactNumber" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label asp-for="OrderModel.CustomerAddress" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Address</label>
+                                    <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                        <textarea type="text" class="form-control" asp-for="OrderModel.CustomerAddress" id="CustomerAddress" rows="3" style="resize:none;" readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @Html.HiddenFor(x => x.OrderModel.OrderID, new { @id = "OrderID", @Value = @_OrderID })
+                            <h3 class="Title" style="display:inline-block;">@ViewBag.Title</h3>
+
+                            <div class="btn-group-sm" style="float:right; position:relative; top:15px;">
+                                <a href="@Url.Action("Details", "Order", new { OrderID = @_OrderID, Mode = "Edit" })" class="btn btn-sm btn-outline-primary" id="ButtonEdit_Order" title="Edit Order Report">
+                                    <span><i class="bi bi-pencil"></i></span>
+                                </a>
+                                <!--
+                                TODO: Able to return to index page at last view page?
+                                -->
+                                <a href="@Url.Action("Index", "Order")" class="btn btn-sm btn-outline-primary" value="ButtonBack" id="ButtonBack" title="Back">
+                                    <span><i class="bi bi-arrow-left"></i></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-md-6">
+                        <br />
+                        <h4>Order Info</h4>
+                        <div class="form-horizontal">
+                            <div class="form-group row mb-3">
+                                <label asp-for="OrderModel.OrderDate" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Order Date</label>
+                                <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                    <input type="date" class="form-control datepicker" asp-for="OrderModel.OrderDate" id="OrderDate" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label asp-for="OrderModel.EmployeeName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Handled By</label>
+                                <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                    <input type="text" class="form-control" asp-for="OrderModel.EmployeeName" id="EmployeeName" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label asp-for="OrderModel.OrderGrandTotal" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Grand Total</label>
+                                <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" asp-for="OrderModel.OrderGrandTotal" asp-format="{0:n2}" id="OrderGrandTotal" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <br />
+                        <h4>Customer Details</h4>
+                        <div class="form-horizontal">
+                            <div class="form-group row mb-3">
+                                <label asp-for="OrderModel.CustomerName" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Recepient</label>
+                                <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                    <input type="text" class="form-control" asp-for="OrderModel.CustomerName" id="CustomerName" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label asp-for="OrderModel.CustomerContactNumber" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Contact</label>
+                                <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                    <input type="text" class="form-control" asp-for="OrderModel.CustomerContactNumber" id="CustomerContactNumber" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label asp-for="OrderModel.CustomerAddress" class="col-xl-3 col-md-3 col-sm-3 col-4 col-form-label Field">Address</label>
+                                <div class="col-xl-9 col-md-9 col-sm-9 col-8">
+                                    <textarea type="text" class="form-control" asp-for="OrderModel.CustomerAddress" id="CustomerAddress" rows="3" style="resize:none;" readonly></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    @if (_Mode == "Edit")
+                    {
+                        <button class="btn btn-sm btn-outline-success" style="position:relative; top:-5px;" type="button" name="" value="" id="ButtonAdd_OrderDetails" title="Add Order Detail">
+                            <span><i class="bi bi-plus"></i>&nbsp;Add New Order Detail</span>
+                        </button>
+                    }
+                </div>
+                <div class="col-md-12">
+                    <div class="form-horizontal">
+                        <div class="table-responsive">
+                            <table class="table TableList table-hover" id="TableOrderDetails">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 10px;">#</th>
+                                        <th style="min-width: 200px;">Product Category</th>
+                                        <th style="min-width: 300px;">Product Name</th>
+                                        <th style="width: 120px;">Quantity</th>
+                                        <th style="width: 120px;">Total Cost</th>
+
+                                        @if (_Mode == "Edit")
+                                        {
+                                            <th style="min-width: 100px;"></th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.OrderModel.OrderDetailList != null)
+                                    {
+                                        int idx = 0;
+                                        foreach (var item in Model.OrderModel.OrderDetailList)
+                                        {
+                                            <tr style="vertical-align:middle;">
+                                                <input type="hidden" asp-for=@item.OrderID id="OrderID">
+                                                <input type="hidden" asp-for=@item.CategoryID id="CategoryID">
+                                                <input type="hidden" asp-for=@item.ProductID id="ProductID">
+
+                                                <td>
+                                                    @{
+                                                        idx++;
+                                                    } @idx.ToString()
+                                                </td>
+                                                <td id="CategoryName"><label>@item.CategoryName</label></td>
+                                                <td id="ProductName"><label>@item.ProductName</label></td>
+                                                <td id="OrderQuantity"><label>@item.OrderQuantity</label></td>
+                                                <td id="OrderTotalCost">$<label>@item.OrderTotalCost.ToString("N2")</label></td>
+
+                                                <td>
+                                                    @if (_Mode == "Edit")
+                                                    {
+                                                        <div class="btn-group-sm">
+                                                            <button class="btn btn-outline-primary" type="button" name="" value="" id="ButtonEdit_OrderDetails" title="Edit Order Detail">
+                                                                <span><i class="bi bi-pencil"></i></span>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger" type="button" name="" value="" id="ButtonDelete_OrderDetails" title="Delete Order Detail" data-target="#ModalDelete_OrderDetails" data-toggle="modal">
+                                                                <span><i class="bi bi-trash"></i></span>
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bootstrap Modal - Order - Delete -->
+            <div class="modal fade" id="ModalDelete_Orders" role="dialog" tabindex="-1">
+                <div class="modal-dialog text-left">
+                    <div class="modal-content">
+                        <form method="post" asp-controller="Order" asp-action="Details" asp-route-OrderID="@_OrderID" asp-route-Mode="Edit" id="FormDelete_Orders" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <div class="modal-header">
+                                <h4 class="Title">Delete</h4>
+                            </div>
+                            <div class="modal-body">
+                                Do you wish to permanently delete this Order?<br /><br />
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-danger" type="submit" name="button" value="DeleteOrders" id="" title="Delete Order">
+                                    <span><i class="bi bi-check2"></i></span>
+                                </button>
+                                <button class="btn btn-outline-primary" data-bs-dismiss="modal" type="button" name="" value="" id="" title="Cancel">
+                                    <span><i class="bi bi-x"></i></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bootstrap Modal - OrderDetails - Delete -->
+            <div class="modal fade" id="ModalDelete_OrderDetails" role="dialog" tabindex="-1">
+                <div class="modal-dialog text-left">
+                    <div class="modal-content">
+                        <form method="post" asp-controller="Order" asp-action="Details" asp-route-OrderID="@_OrderID" asp-route-Mode="Edit" id="FormDelete_OrderDetails" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <div class="modal-header">
+                                <h4 class="Title">Delete</h4>
+                            </div>
+                            <div class="modal-body">
+                                Do you wish to permanently delete this Order Detail?<br /><br />
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-danger" type="submit" name="button" value="DeleteOrderDetails" id="" title="Delete Order Details">
+                                    <span><i class="bi bi-check2"></i></span>
+                                </button>
+                                <button class="btn btn-outline-primary" data-bs-dismiss="modal" type="button" name="" value="" id="" title="Cancel">
+                                    <span><i class="bi bi-x"></i></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bootstrap Modal - OrderDetails - AddEdit -->
+            <div class="modal fade" id="ModalAddEdit_OrderDetails" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form method="post" asp-controller="Order" asp-action="Details" asp-route-OrderID="@_OrderID" asp-route-Mode="Edit" id="FormAddEdit_OrderDetails" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <div class="modal-header">
+                                <h4 class="Title"></h4>
+                            </div>
+                            <div class="modal-body">
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-success" type="submit" name="button" value="" id="ButtonSave_OrderDetails" title="Order Details">
+                                    <span><i class="bi bi-save"></i></span>
+                                </button>
+                                <button class="btn btn-outline-primary" data-bs-dismiss="modal" type="button" name="" value="" id="" title="Cancel">
+                                    <span><i class="bi bi-x-lg"></i></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
