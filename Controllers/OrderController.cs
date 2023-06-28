@@ -6,6 +6,7 @@ using System.Text;
 using WebApp.DbContext.Entities;
 using WebApp.DbContext;
 using WebApp.Models;
+using WebApp.Extensions;
 
 namespace WebApp.Controllers
 {
@@ -18,23 +19,24 @@ namespace WebApp.Controllers
             _db = db;
         }
 
-        private void TriggerBootstrapAlerts(AlertType Type, string Message)
+        private void TriggerBootstrapAlerts(BootstrapAlertType Type, string Message)
         {
             string _type;
             switch (Type)
             {
-                case AlertType.Info: _type = "alert-info"; break;
-                case AlertType.Warning: _type = "alert-warning"; break;
-                case AlertType.Danger: _type = "alert-danger"; break;
-                case AlertType.Success: _type = "alert-success"; break;
+                case BootstrapAlertType.Info: _type = "alert-info"; break;
+                case BootstrapAlertType.Warning: _type = "alert-warning"; break;
+                case BootstrapAlertType.Danger: _type = "alert-danger"; break;
+                case BootstrapAlertType.Success: _type = "alert-success"; break;
                 default: _type = "alert-danger"; break;
             }
 
-            TempData["Alerts"] = new Alerts
+            TempData.Put("Alerts", new BootstrapAlert
             {
                 Type = _type,
                 Message = Message
-            };
+            }
+            );
         }
 
         private string Decrypt(string encrypted)
@@ -169,7 +171,7 @@ namespace WebApp.Controllers
             catch (DbUpdateException exception)
             {
                 Debug.WriteLine(exception.Message);
-                TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
             }
 
             return _db.Orders.Find(NewOrderID);
@@ -192,7 +194,7 @@ namespace WebApp.Controllers
             catch (DbUpdateException exception)
             {
                 Debug.WriteLine(exception.Message);
-                TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
             }
 
             return mOrderDetails;
@@ -219,14 +221,14 @@ namespace WebApp.Controllers
                 catch (DbUpdateException exception)
                 {
                     Debug.WriteLine(exception.Message);
-                    TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                     return false;
                 }
                 return true;
             }
             else
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request. ID not found.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request. ID not found.");
             }
             return false;
         }
@@ -246,14 +248,14 @@ namespace WebApp.Controllers
                 catch (DbUpdateException exception)
                 {
                     Debug.WriteLine(exception.Message);
-                    TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                     return false;
                 }
                 return true;
             }
             else
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request. ID not found.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request. ID not found.");
             }
 
             return false;
@@ -323,7 +325,7 @@ namespace WebApp.Controllers
                 catch (DbUpdateException exception)
                 {
                     Debug.WriteLine(exception.Message);
-                    TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                 }
             }
 
@@ -350,7 +352,7 @@ namespace WebApp.Controllers
                 catch (DbUpdateException exception)
                 {
                     Debug.WriteLine(exception.Message);
-                    TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                 }
             }
             return mOrderDetails;
@@ -362,7 +364,7 @@ namespace WebApp.Controllers
         {
             if (string.IsNullOrEmpty(Mode) || !(Mode == "Edit" || Mode == "View"))
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request 3. Invalid model.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request 3. Invalid model.");
                 return RedirectToAction("Index");
             }
 
@@ -392,7 +394,7 @@ namespace WebApp.Controllers
                 }
                 else
                 {
-                    TriggerBootstrapAlerts(AlertType.Danger, "Bad Request 5. Invalid model.");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request 5. Invalid model.");
                     return RedirectToAction("Index");
                 }
             }
@@ -401,7 +403,7 @@ namespace WebApp.Controllers
                 mNestedOrderModel = RetrieveOrder(OrderID.Value);
                 if (mNestedOrderModel == null)
                 {
-                    TriggerBootstrapAlerts(AlertType.Danger, "Bad Request 4. Invalid model.");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request 4. Invalid model.");
                     return RedirectToAction("Index");
                 }
             }
@@ -420,14 +422,14 @@ namespace WebApp.Controllers
                 string.IsNullOrEmpty(Mode) || Mode != "Edit" ||
                 string.IsNullOrEmpty(button) || !(button == "CreateOrders" || button == "UpdateOrders" || button == "DeleteOrders" || button == "CreateOrderDetails" || button == "UpdateOrderDetails" || button == "DeleteOrderDetails"))
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request 1. Invalid model.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request 1. Invalid model.");
                 return RedirectToAction("Details", new { OrderID = OrderID, Mode = "View" });
             }
 
             if (((button == "UpdateOrders" || button == "DeleteOrders") && !OrderID.HasValue) ||
                 ((button == "CreateOrderDetails" || button == "UpdateOrderDetails" || button == "DeleteOrderDetails") && !(OrderID.HasValue && ProductID.HasValue)))
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request 2. Invalid model.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request 2. Invalid model.");
                 return RedirectToAction("Details", new { OrderID = OrderID, Mode = "View" });
             }
 
@@ -441,11 +443,11 @@ namespace WebApp.Controllers
                 {
                     if (DeleteOrders(OrderID.Value))
                     {
-                        TriggerBootstrapAlerts(AlertType.Success, "Successfully delete order report.");
+                        TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully delete order report.");
                     }
                     else
                     {
-                        TriggerBootstrapAlerts(AlertType.Danger, "Failed to delete order report.");
+                        TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Failed to delete order report.");
                     }
                     return RedirectToAction("Index");
                 }
@@ -458,12 +460,12 @@ namespace WebApp.Controllers
                             mOrder = CreateOrders(NestedOrderModel);
                             if (mOrder == null)
                             {
-                                TriggerBootstrapAlerts(AlertType.Danger, "Failed to create new order report.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Failed to create new order report.");
                             }
                             else
                             {
                                 NewOrderID = mOrder.OrderId;
-                                TriggerBootstrapAlerts(AlertType.Success, "Successfully create new order report.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully create new order report.");
                             }
                         }
                         if (button == "UpdateOrders")
@@ -471,18 +473,18 @@ namespace WebApp.Controllers
                             mOrder = UpdateOrders(OrderID.Value, NestedOrderModel);
                             if (mOrder == null)
                             {
-                                TriggerBootstrapAlerts(AlertType.Danger, "Failed to update order report.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Failed to update order report.");
                             }
                             else
                             {
-                                TriggerBootstrapAlerts(AlertType.Success, "Successfully update order report.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully update order report.");
                             }
                             NewOrderID = OrderID.Value;
                         }
                     }
                     else
                     {
-                        TriggerBootstrapAlerts(AlertType.Danger, "Bad Request. Invalid model.");
+                        TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request. Invalid model.");
                         return RedirectToAction("Details", new { OrderID = OrderID, Mode = "View" });
                     }
                 }
@@ -494,11 +496,11 @@ namespace WebApp.Controllers
                 {
                     if (DeleteOrderDetails(OrderID.Value, ProductID.Value))
                     {
-                        TriggerBootstrapAlerts(AlertType.Success, "Successfully delete order details.");
+                        TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully delete order details.");
                     }
                     else
                     {
-                        TriggerBootstrapAlerts(AlertType.Danger, "Failed to delete order details.");
+                        TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Failed to delete order details.");
                     }
                 }
                 else
@@ -510,11 +512,11 @@ namespace WebApp.Controllers
                             mOrderDetails = CreateOrderDetails(NestedOrderModel);
                             if (mOrderDetails == null)
                             {
-                                TriggerBootstrapAlerts(AlertType.Danger, "Failed to create order details.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Failed to create order details.");
                             }
                             else
                             {
-                                TriggerBootstrapAlerts(AlertType.Success, "Successfully create order details.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully create order details.");
                             }
                         }
                         if (button == "UpdateOrderDetails")
@@ -522,17 +524,17 @@ namespace WebApp.Controllers
                             mOrderDetails = UpdateOrderDetails(OrderID.Value, ProductID.Value, NestedOrderModel);
                             if (mOrderDetails == null)
                             {
-                                TriggerBootstrapAlerts(AlertType.Danger, "Failed to update order details.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Failed to update order details.");
                             }
                             else
                             {
-                                TriggerBootstrapAlerts(AlertType.Success, "Successfully update order details.");
+                                TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully update order details.");
                             }
                         }
                     }
                     else
                     {
-                        TriggerBootstrapAlerts(AlertType.Danger, "Bad Request. Invalid model.");
+                        TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request. Invalid model.");
                         return RedirectToAction("Details", new { OrderID = OrderID, Mode = "View" });
                     }
                 }

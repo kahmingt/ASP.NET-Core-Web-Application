@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp.DbContext;
 using WebApp.DbContext.Entities;
+using WebApp.Extensions;
 using WebApp.Models;
 
 namespace WebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -17,23 +19,24 @@ namespace WebApp.Controllers
             _db = db;
         }
 
-        private void TriggerBootstrapAlerts(AlertType Type, string Message)
+        private void TriggerBootstrapAlerts(BootstrapAlertType Type, string Message)
         {
             string _type;
             switch (Type)
             {
-                case AlertType.Info: _type = "alert-info"; break;
-                case AlertType.Warning: _type = "alert-warning"; break;
-                case AlertType.Danger: _type = "alert-danger"; break;
-                case AlertType.Success: _type = "alert-success"; break;
+                case BootstrapAlertType.Info: _type = "alert-info"; break;
+                case BootstrapAlertType.Warning: _type = "alert-warning"; break;
+                case BootstrapAlertType.Danger: _type = "alert-danger"; break;
+                case BootstrapAlertType.Success: _type = "alert-success"; break;
                 default: _type = "alert-danger"; break;
             }
 
-            TempData["Alerts"] = new Alerts
+            TempData.Put("Alerts", new BootstrapAlert
             {
                 Type = _type,
                 Message = Message
-            };
+            }
+            );
         }
 
 
@@ -56,11 +59,11 @@ namespace WebApp.Controllers
             }
             catch (DbUpdateException exception)
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                 return false;
             }
 
-            TriggerBootstrapAlerts(AlertType.Success, "Successfully create product.");
+            TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully create product.");
             return true;
         }
 
@@ -121,16 +124,16 @@ namespace WebApp.Controllers
                 }
                 catch (DbUpdateException exception)
                 {
-                    TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                     return false;
                 }
 
-                TriggerBootstrapAlerts(AlertType.Success, "Successfully update product.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully update product.");
                 return true;
             }
             else
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request!");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request!");
             }
             return false;
         }
@@ -151,16 +154,16 @@ namespace WebApp.Controllers
                 }
                 catch (DbUpdateException exception)
                 {
-                    TriggerBootstrapAlerts(AlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
+                    TriggerBootstrapAlerts(BootstrapAlertType.Danger, "500 Internal Server Error. " + exception.Message + ".");
                     return false;
                 }
 
-                TriggerBootstrapAlerts(AlertType.Success, "Successfully delete product.");
+                TriggerBootstrapAlerts(BootstrapAlertType.Success, "Successfully delete product.");
                 return true;
             }
             else
             {
-                TriggerBootstrapAlerts(AlertType.Danger, "Bad Request!");
+                TriggerBootstrapAlerts(BootstrapAlertType.Danger, "Bad Request!");
             }
             return false;
         }

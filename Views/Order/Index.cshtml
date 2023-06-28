@@ -12,19 +12,7 @@
 <div class="container">
     <div class="panel">
         <div class="panel-body">
-            <div class="row">
-                @if (TempData["Alerts"] != null)
-                {
-                    var Alerts = (TempData["Alerts"]) as WebApp.Models.Alerts;
-                    <div class="alert @Alerts.Type alert-dismissible fade show" role="alert">
-                        <button class="close" data-bs-dismiss="alert" aria-label="Close" style="background:none; color:inherit;	border:none;">
-                            <span aria-hidden="true" style="font-size:1.45em;">&times;</span>
-                        </button>
-                        @Alerts.Message
-                    </div>
-                }
-                @Html.Raw(ViewBag.Alert)
-            </div>
+            <partial name="_BootstrapAlert" />
             <br />
             <div class="row">
                 <div class="input-group mb-3" style="display:flex; align-items:center; justify-content:space-between;">

@@ -1,8 +1,10 @@
-﻿<div class="row">
+﻿@using WebApp.Extensions
+
+<div class="row">
     @if (TempData["Alerts"] != null)
     {
-        var Alerts = (TempData["Alerts"]) as WebApp.Models.Alerts;
-        <div class="alert @Alerts.Type alert-dismissible fade show" role="alert">
+        var Alerts = TempData.Get<BootstrapAlert>("Alerts") as WebApp.Models.BootstrapAlert;
+        <div class="alert @Alerts.Type alert-dismissible fade show" role="alert" style="padding: 0.5rem;">
             <button class="close" data-bs-dismiss="alert" aria-label="Close" style="background:none; color:inherit;	border:none;">
                 <span aria-hidden="true" style="font-size:1.45em;">&times;</span>
             </button>
